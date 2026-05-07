@@ -29,17 +29,17 @@
 
     }
 
-    function withdraw(&$wallet, $amount, &$transaction, &$Error){
+    function withdraw(&$wallet, $amount, &$transaction){
 
         if($amount > $wallet['balance']){
          
-            $Error =  ['You do not have enough money in wallet!'];
+            return 'You do not have enough money in wallet!';
         
         }else{
             
             $wallet['balance'] -= $amount;
             $transaction[] = ['type' => 'withdrawal', 'amount' => $amount];
-
+            return 'Withdrwal Succuss';
         }
     }
 
@@ -52,7 +52,7 @@
     }
 
     function validateInput($input){
-        if($input < 0){
+        if($input <= 0 ){
             return 'Amount cannot be zero or less than zero!';
         }elseif(!ctype_digit($input)){
             return 'Amount is not a number! ';
@@ -79,6 +79,27 @@
                 }else{
                     echo "\n".$inputValid. "\n\n";
                 };
+                break;
+            
+            case 3:
+                $withdrawAmount = readline("Enter amount to withdraw(KES): ");
+                $inputValid = validateInput($withdrawAmount);
+
+                if($inputValid == $withdrawAmount){
+                    echo "\n" . withdraw($wallet, $inputValid, $transactions). "\n\n";
+                }else{
+                    echo "\n" . $inputValid. "\n\n";
+                }
+                break;
+
+            case 4:
+
+                echo "\n";
+                showTransactions($transactions);
+                echo "\n\n";
+                break;
+
+
         };
     }while($option != 5);
     
