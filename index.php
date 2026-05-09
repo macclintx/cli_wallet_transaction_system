@@ -1,5 +1,6 @@
 <?php 
-    
+    define('TRANSACTION_FEE_ON_WIHTDRAW', 0.02); //decimal percentage(2/100)
+
     //initial balance
     $wallet = [
         'name' => '',
@@ -23,7 +24,7 @@
         }else{
 
             $wallet['balance'] += $amount;
-            $transaction[] = ['type' => 'deposit', 'amount' => $amount];    
+            $transaction[] = ['type' => 'deposit', 'amount' => $amount, 'fee' => null];    
             return 'Deposit Success';
         }
 
@@ -36,17 +37,24 @@
             return 'You do not have enough money in wallet!';
         
         }else{
-            
-            $wallet['balance'] -= $amount;
-            $transaction[] = ['type' => 'withdrawal', 'amount' => $amount];
-            return 'Withdrwal Succuss';
+            //withdraw fee feature
+            $transactionFee = transactionFeeOnWithdraw($amount, TRANSACTION_FEE_ON_WIHTDRAW);
+
+
+            $wallet['balance'] -= ($amount + $transactionFee);
+            $transaction[] = ['type' => 'withdrawal', 'amount' => $amount, 'fee' => $transactionFee];
+
+
+            return 'Withdrwal Success';
         }
     }
 
     function showTransactions($transactions){
         $counter = 1;
+        
+        echo "No\tType\t\t\tAmount\t\t\tFee\n";
         foreach($transactions as $transaction){
-            echo $counter++ . ". ". $transaction['type']. ", KES ". $transaction['amount']. "\n"; 
+            echo $counter++ . ".\t". $transaction['type']. "\t\t\tKES ". $transaction['amount']. "\t\tKES ", $transaction['fee'].  "\n"; 
         }
         
     }
@@ -59,6 +67,10 @@
         }else{
             return $input;
         }
+    }
+
+    function transactionFeeOnWithdraw($amount, $fee){
+        return $amount * $fee;
     }
 
 
@@ -99,7 +111,14 @@
                 echo "\n\n";
                 break;
 
+            case 5:
+                
+                echo "\n\n==== Exiting ====\n\n";
+                break;
 
+            default:
+                echo "\n\nInvalid input!\n\n";
+                break;    
         };
     }while($option != 5);
     
