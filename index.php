@@ -1,13 +1,13 @@
 <?php 
-    define('TRANSACTION_FEE_ON_WIHTDRAW', 0.02); //decimal percentage(2/100)
+    define('TRANSACTION_FEE_ON_WITHDRAW', 0.02); //decimal percentage(2/100)
 
     //initial balance
     $wallet = [
-        'name' => '',
+        'name' => 'User Error',
         'balance' => 100
     ];
+
     $transactions = [];
-    $Errors = [];
 
     function showMenu(){
         
@@ -36,16 +36,21 @@
          
             return 'You do not have enough money in wallet!';
         
-        }else{
+        }
+        else{
             //withdraw fee feature
-            $transactionFee = transactionFeeOnWithdraw($amount, TRANSACTION_FEE_ON_WIHTDRAW);
+            $transactionFee = transactionFeeOnWithdraw($amount, TRANSACTION_FEE_ON_WITHDRAW);
+            $totalWithdrawal = $amount + $transactionFee;
 
+            if( $totalWithdrawal > $wallet['balance']){
+                return "You do not have enough balance to withdraw and pay transaction fee!";
+            }
 
             $wallet['balance'] -= ($amount + $transactionFee);
             $transaction[] = ['type' => 'withdrawal', 'amount' => $amount, 'fee' => $transactionFee];
 
 
-            return 'Withdrwal Success';
+            return 'Withdraw Success';
         }
     }
 
@@ -86,7 +91,7 @@
             case 2: 
                 $depositAmount = readline("Enter amount to deposit(KES): ");
                 $inputValid = validateInput($depositAmount);
-                if ($inputValid == $depositAmount){
+                if ($inputValid === $depositAmount){
                     echo "\n".deposit($wallet, $inputValid, $transactions)."\n\n";
                 }else{
                     echo "\n".$inputValid. "\n\n";
@@ -97,7 +102,7 @@
                 $withdrawAmount = readline("Enter amount to withdraw(KES): ");
                 $inputValid = validateInput($withdrawAmount);
 
-                if($inputValid == $withdrawAmount){
+                if($inputValid === $withdrawAmount){
                     echo "\n" . withdraw($wallet, $inputValid, $transactions). "\n\n";
                 }else{
                     echo "\n" . $inputValid. "\n\n";
@@ -107,7 +112,9 @@
             case 4:
 
                 echo "\n";
-                showTransactions($transactions);
+                if(empty(showTransactions($transactions))){
+                    echo "No transaction(s) found!";
+                }
                 echo "\n\n";
                 break;
 
@@ -121,7 +128,4 @@
                 break;    
         };
     }while($option != 5);
-    
 
-   
-//echo showMenu();
